@@ -15,16 +15,52 @@ const player = {
 const items = []
 let score = 0;
 
-function drawPlayer() {
-    ctx.fillStyle = "#FFD700";
-    ctx.fillRect(player.x, player.y, player.width, player.height);
+function drawPlayer(x, y, w, h) {
+    const cx = x + w / 2;
+
+    //dunno if works cant test it --> want to change it to snowman w/ falling snowflakes
     ctx.fillStyle = "#000";
     ctx.beginPath();
-    ctx.arc(player.x + 15, player.y + 15, 3, 0, Math.PI * 2);
+    ctx.ellipse(cx, y + h + 2, w * 0.4, 7, 0, 0, Math.PI * 2);
     ctx.fill();
+
+    //should be the bodies circles
+    const r1 = w * 0.28;
+    const r2 = w * 0.22;
+
+    ctx.fillStlye = "#eaf5ff";
+    beginPath();
+    ctx.arc(cx, y + h, r1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStye = "#b8d8f0";
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.arc(player.x + 25, player.y + 15, 3, 0, Math.PI * 2);
+    ctx.arc(cx, y + h, r1, 0, Math.Pi * 2);
+    ctx.stroke();
+
+    ctx.fillStyle = "#eaf5ff";
+    ctx.beginPath();
+    ctx.arc(cx, y + h, r2, 0, Math.PI * 2);
     ctx.fill();
+    ctx.strokeStye = "#b8d8f0";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(cx, y + h, r2, 0, Math.PI * 2);
+    ctx.stroke();
+
+
+
+
+
+    // ctx.fillStyle = "#FFD700";
+    // ctx.fillRect(player.x, player.y, player.width, player.height);
+    // ctx.fillStyle = "#000";
+    // ctx.beginPath();
+    // ctx.arc(player.x + 15, player.y + 15, 3, 0, Math.PI * 2);
+    // ctx.fill();
+    // ctx.beginPath();
+    // ctx.arc(player.x + 25, player.y + 15, 3, 0, Math.PI * 2);
+    // ctx.fill();
 }
 
 function drawItems() {
@@ -91,8 +127,8 @@ function gameLoop() {
 }
 
 document.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowLeft") player.dx = -5;
-    if (e.key === "ArrowRight") player.dx = 5;
+    if (e.key === "ArrowLeft" || e.key === "a") player.dx = -5;
+    if (e.key === "ArrowRight" || e.key === "d") player.dx = 5;
 });
 
 document.addEventListener("keyup", () => {
