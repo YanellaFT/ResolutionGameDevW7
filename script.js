@@ -2,7 +2,7 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 canvas.width = 400;
-canvas.height = 600;
+canvas.height = 580;
 
 const player = {
     x: canvas.width / 2 - 50,
@@ -18,37 +18,76 @@ let score = 0;
 function drawPlayer(x, y, w, h) {
     const cx = x + w / 2;
 
-    //dunno if works cant test it --> want to change it to snowman w/ falling snowflakes
-    ctx.fillStyle = "#000";
+    //snowman w/ falling snowflakes --> works!
+    ctx.fillStyle = "#4c4c4c";
     ctx.beginPath();
     ctx.ellipse(cx, y + h + 2, w * 0.4, 7, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    //should be the bodies circles
+    //bodies circles bottom
     const r1 = w * 0.28;
-    const r2 = w * 0.22;
-
-    ctx.fillStlye = "#eaf5ff";
-    beginPath();
-    ctx.arc(cx, y + h, r1, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStye = "#b8d8f0";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.arc(cx, y + h, r1, 0, Math.Pi * 2);
-    ctx.stroke();
-
     ctx.fillStyle = "#eaf5ff";
     ctx.beginPath();
-    ctx.arc(cx, y + h, r2, 0, Math.PI * 2);
+    ctx.arc(cx, y + h - r1, r1, 0, Math.PI * 2);
     ctx.fill();
     ctx.strokeStye = "#b8d8f0";
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.arc(cx, y + h, r2, 0, Math.PI * 2);
+    ctx.arc(cx, y + h - r1, r1, 0, Math.Pi * 2);
+    ctx.stroke();
+    // top circle
+    const r2 = w * 0.22;
+    ctx.fillStyle = "#eaf5ff";
+    ctx.beginPath();
+    ctx.arc(cx, y + h - r1 * 2 - r2 + 2, r2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#b8d8f0";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(cx, y + h - r1 * 2 - r2 + 2, r2, 0, Math.PI * 2);
     ctx.stroke();
 
+    //eyes
+    const ypos_eyes = y + h - r1 * 2 - r2 + 2 - r2 * 0.2;
+    ctx.fillStyle = '#0b0b0b';
+    ctx.beginPath();
+    ctx.arc(cx - r2 * 0.35, ypos_eyes, 2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(cx + r2 * 0.35, ypos_eyes, 2, 0, Math.PI * 2);
+    ctx.fill();
 
+    // the carrot nose 
+    const ypos_nose = y + h -r2 + 2 - r1 * 2 + 1;
+    ctx.fillStyle = "#ff8c00";
+    ctx.beginPath();
+    ctx.moveTo(cx, ypos_nose + 1);
+    ctx.lineTo(cx + r2 * 0.5, ypos_nose + 2);
+    ctx.lineTo(cx, ypos_nose + 4.5);
+    ctx.closePath();
+    ctx.fill();
+
+    //stick arms
+    const ypos_arms = y + h - r1 * 2 - r2 + 2;
+    ctx.strokeStyle = "#8b5e3c";
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.beginPath(); //left one
+    ctx.moveTo(cx - r2, ypos_arms + 15);
+    ctx.lineTo(cx - r2 - 10, ypos_arms + r2 *0.3 + 2);
+    ctx.stroke();
+    ctx.beginPath();//right one
+    ctx.moveTo(cx + r2, ypos_arms + 15);
+    ctx.lineTo(cx + r2 + 10, ypos_arms + r2 * 0.3 + 2);
+    ctx.stroke();
+
+    //hattt
+    const ypos_hat = y + h - r1 * 2 - r2 - r2 - 7;
+    ctx.fillStyle = '#1a2a3a';
+    ctx.fillRect(cx - r2 * 0.7, ypos_hat, r2 * 1.4, r2 * 0.7, 3);
+    ctx.fillRect(cx - r2 * 0.9, ypos_hat + r2 * 0.7, r2 * 1.8, 5);
+    ctx.fillStyle = '#b1f74f';
+    ctx.fillRect(cx - r2 * 0.7, ypos_hat + r2 * 0.5, r2 * 1.4, 3);    
 
 
 
@@ -119,7 +158,7 @@ function gameLoop() {
     updatePlayer();
     updateItems();
     
-    drawPlayer();
+    drawPlayer(player.x, player.y, player.width, player.height);
     drawItems();
     drawScore();
     
