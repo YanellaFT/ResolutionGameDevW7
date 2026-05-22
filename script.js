@@ -4,16 +4,24 @@ const ctx = canvas.getContext("2d");
 canvas.width = 400;
 canvas.height = 580;
 
-const player = {
-    x: canvas.width / 2 - 50,
-    y: canvas.height - 50,
-    width: 40,
-    height: 40,
-    dx: 0
-};
+let flakes, score, misses, gameSpeed;
+let state = "home";
 
-const items = []
-let score = 0;
+function initGame() {
+    const player = {
+        x: canvas.width / 2 - 50,
+        y: canvas.height - 50,
+        width: 40,
+        height: 40,
+        dx: 0
+    };
+    flakes = []
+    score = 0;
+    misses = 0;
+    gameSpeed = 1;
+}
+const max_misses = 5;
+
 
 function drawPlayer(x, y, w, h) {
     const cx = x + w / 2;
@@ -102,19 +110,50 @@ function drawPlayer(x, y, w, h) {
     // ctx.fill();
 }
 
-function drawItems() {
-    items.forEach((item, index) => {
-        ctx.fillStyle = "#FF69B4";
-        ctx.beginPath();
-        ctx.arc(item.x, item.y, item.radius, 0, Math.PI * 2);
-        ctx.fill();
-    });
+function makeSnowflake() {
+    const speed = (1 + Math.random() * 1.2) * gameSpeed;
+
+    return {
+        x: 20 + Math.random() * (W - 40),
+        y: -15,
+        r: 7 + Math.random(),
+        dy: speed,
+        rotation: Math.random() * Math.PI * 2,
+        spin: (Math.random() - 0.5) * 0.06
+    };
+}
+
+function drawSnowflake(f) {
+    
+    ctx.strokeStyle = "#c7ddeb"
+    ctx.lineWidth = 1.8;
+
+    for (let i = 0; i < 6; i++) {
+        ctx.save();
+        ctx.rotate(i * Math.PI / 3)
+    }
+
+    //def not done
+
+
+
+    // items.forEach((item, index) => {
+    //     ctx.fillStyle = "#FF69B4";
+    //     ctx.beginPath();
+    //     ctx.arc(item.x, item.y, item.radius, 0, Math.PI * 2);
+    //     ctx.fill();
+    // });
 }
 
 function drawScore() {
     ctx.fillStyle = "#fff";
     ctx.font = "bold 20px Arial";
     ctx.fillText("Score: " + score, 10, 30);
+
+    for (let i = 0; i < max_misses; i++) {
+        ctx.fillStyle = i < (max_misses - misses) ? "#ef3737" : "#393737f";
+        ctx.fillText("h", w - 14 - i * 20, 30) //change to heart pic later
+    }
 }
 
 function updatePlayer() {
@@ -123,23 +162,30 @@ function updatePlayer() {
     if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
 }
 
-function updateItems() {
-    items.forEach((item, index) => {
-        item.y += item.dy;
-        if (
-            item.x > player.x &&
-            item.x < player.x + player.width &&
-            item.y > player.y &&
-            item.y < player.y + player.height
-        ) {
-            items.splice(index, 1);
-            score++;
-        }
+function updateGame() {
+    player.x += player.dx;
+    player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+
+    gameSpeed = score * 1.045;
+
+    if (misses > max_misses) showLose();
+
+    // items.forEach((item, index) => {
+    //     item.y += item.dy;
+    //     if (
+    //         item.x > player.x &&
+    //         item.x < player.x + player.width &&
+    //         item.y > player.y &&
+    //         item.y < player.y + player.height
+    //     ) {
+    //         items.splice(index, 1);
+    //         score++;
+    //     }
         
-        if (item.y > canvas.height) {
-            items.splice(index, 1);
-        }
-    });
+    //     if (item.y > canvas.height) {
+    //         items.splice(index, 1);
+    //     }
+    // });
 }
 
 function createItem() {
@@ -153,16 +199,31 @@ function createItem() {
 }
 
 function gameLoop() {
+if (state !== "playing") {
+    requestAnimationFrame(gameLoop);
+    return;
+}
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    updatePlayer();
-    updateItems();
+    // updatePlayer();
+    // updateItems();
     
-    drawPlayer(player.x, player.y, player.width, player.height);
-    drawItems();
-    drawScore();
-    
+    // drawPlayer(player.x, player.y, player.width, player.height);
+    // drawItems();
+    // drawScore();
+
+    drawSnowman(player.x, player.y, player.width, player.height);
+    updateGame();
     requestAnimationFrame(gameLoop);
+    
+}
+
+function showLoose() {
+    state = "lose";
+    document.getElementById("finalScore").textContent = score;
+
+
 }
 
 document.addEventListener("keydown", (e) => {
