@@ -2,13 +2,15 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 canvas.width = 400;
-canvas.height = 600;
+canvas.height = 580;
 
-let flakes, score, misses, gameSpeed;
+let player, flakes, score, misses, gameSpeed;
 let state = "home";
 
+const max_misses = 5;
+
 function initGame() {
-    const player = {
+    player = {
         x: canvas.width / 2 - 50,
         y: canvas.height - 50,
         width: 40,
@@ -20,8 +22,6 @@ function initGame() {
     misses = 0;
     gameSpeed = 1;
 }
-const max_misses = 5;
-
 
 function drawPlayer(x, y, w, h) {
     const cx = x + w / 2;
@@ -38,10 +38,10 @@ function drawPlayer(x, y, w, h) {
     ctx.beginPath();
     ctx.arc(cx, y + h - r1, r1, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStye = "#b8d8f0";
+    ctx.strokeStyle = "#b8d8f0";
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.arc(cx, y + h - r1, r1, 0, Math.Pi * 2);
+    ctx.arc(cx, y + h - r1, r1, 0, Math.PI * 2);
     ctx.stroke();
     // top circle
     const r2 = w * 0.22;
@@ -124,6 +124,9 @@ function makeSnowflake() {
 }
 
 function drawSnowflake(f) {
+    ctx.save();
+    ctx.translate(f.x, f.y);
+    ctx.rotate(f.rotation);
     
     ctx.strokeStyle = "#c7ddeb"
     ctx.lineWidth = 1.8;
@@ -151,7 +154,7 @@ function drawScore() {
     ctx.fillText("Score: " + score, 10, 30);
 
     for (let i = 0; i < max_misses; i++) {
-        ctx.fillStyle = i < (max_misses - misses) ? "#ef3737" : "#393737f";
+        ctx.fillStyle = i < (max_misses - misses) ? "#ef3737" : rgb(0, 0, 0);
         ctx.fillText("h", w - 14 - i * 20, 30) //change to heart pic later
     }
 }
@@ -166,9 +169,9 @@ function updateGame() {
     player.x += player.dx;
     player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
 
-    gameSpeed = score * 1.045;
+    gameSpeed = 1+ score * 0.045;
 
-    if (misses > max_misses) showLose();
+    if (misses >= max_misses) showLose();
 
     // items.forEach((item, index) => {
     //     item.y += item.dy;
@@ -188,15 +191,15 @@ function updateGame() {
     // });
 }
 
-function createItem() {
-    const item = {
-        x: Math.random() * (canvas.width - 20),
-        y: -20,
-        radius: 10,
-        dy: Math.random() * 2 + 1
-    };
-    items.push(item);
-}
+// function createItem() {
+//     const item = {
+//         x: Math.random() * (canvas.width - 20),
+//         y: -20,
+//         radius: 10,
+//         dy: Math.random() * 2 + 1
+//     };
+//     // items.push(item);
+// }
 
 function gameLoop() {
 if (state !== "playing") {
@@ -213,13 +216,16 @@ if (state !== "playing") {
     // drawItems();
     // drawScore();
 
+    flakes.forEach(drawSnowflake);
     drawSnowman(player.x, player.y, player.width, player.height);
     updateGame();
+    drawScore();
+
     requestAnimationFrame(gameLoop);
     
 }
 
-function showLoose() {
+function showLose() {
     state = "lose";
     document.getElementById("finalScore").textContent = score;
 
@@ -235,6 +241,6 @@ document.addEventListener("keyup", () => {
     player.dx = 0;
 });
 
-setInterval(createItem, 1000);
+// setInterval(makeSn, 1000);
 
 gameLoop();
