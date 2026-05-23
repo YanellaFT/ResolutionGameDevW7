@@ -1,4 +1,3 @@
-// play btn DOES NOT WORK
 // play again btn does work
 // fix home screen
 // show loose screen doesnt work
@@ -18,7 +17,7 @@ const max_misses = 5;
 function initGame() {
     player = {
         x: canvas.width / 2 - 28,
-        y: canvas.height - 80,
+        y: canvas.height - 90,
         width:56,
         height: 70,
         dx: 0
@@ -179,7 +178,7 @@ function drawScore() {
 
     for (let i = 0; i < max_misses; i++) {
         ctx.fillStyle = i < (max_misses - misses) ? "#ef3737" : "rgb(0, 0, 0)";
-        ctx.fillText("h", canvas.width - 14 - i * 20, 30) //change to heart pic later
+        ctx.fillText("X", canvas.width - 25 - i * 20, 30) //change to heart pic later
     }
 }
 
@@ -299,7 +298,7 @@ document.addEventListener("keyup", () => {
 
 // setInterval(makeSn, 1000);
 
-document.getElementById("play_btn").onlick = () => {
+document.getElementById("play_btn").onclick = () => {
     document.getElementById("home_screen").style.display = "none";
     state = "playing";
     initGame();
