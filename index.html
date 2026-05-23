@@ -7,7 +7,20 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <canvas id="gameCanvas"></canvas>
+    <div id="game">
+        <canvas id="gameCanvas"></canvas>
+
+        <div class="screen" id="home_screen">
+            <div class="title">Snow Catcher - ResolutionGameDevW7</div>
+            <button class="btn" id="play_btn">Play</button>
+        </div>
+
+        <div class="screen" id="lose_screen">
+            <div class="title">Game Over!</div>
+            <div id="final_score"></div>
+            <button class="btn" id="replay_btn"> Play Again</button>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>

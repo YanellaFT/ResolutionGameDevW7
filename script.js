@@ -1,26 +1,33 @@
+// play btn DOES NOT WORK
+// play again btn does work
+// fix home screen
+// show loose screen doesnt work
+// styel everything
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 canvas.width = 400;
 canvas.height = 580;
 
-let player, flakes, score, misses, gameSpeed;
+let player, flakes, score, misses, gameSpeed, spawnTimer;
 let state = "home";
 
 const max_misses = 5;
 
 function initGame() {
     player = {
-        x: canvas.width / 2 - 50,
-        y: canvas.height - 50,
-        width: 40,
-        height: 40,
+        x: canvas.width / 2 - 28,
+        y: canvas.height - 80,
+        width:56,
+        height: 70,
         dx: 0
     };
-    flakes = []
+    flakes = [];
     score = 0;
     misses = 0;
     gameSpeed = 1;
+    spawnTimer = 0;
 }
 
 function drawPlayer(x, y, w, h) {
@@ -114,9 +121,9 @@ function makeSnowflake() {
     const speed = (1 + Math.random() * 1.2) * gameSpeed;
 
     return {
-        x: 20 + Math.random() * (W - 40),
+        x: 20 + Math.random() * (canvas.width - 40),
         y: -15,
-        r: 7 + Math.random(),
+        r: 7 + Math.random() * 4,
         dy: speed,
         rotation: Math.random() * Math.PI * 2,
         spin: (Math.random() - 0.5) * 0.06
@@ -134,7 +141,24 @@ function drawSnowflake(f) {
     for (let i = 0; i < 6; i++) {
         ctx.save();
         ctx.rotate(i * Math.PI / 3)
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, f.r);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0, f.r * 0.5);
+        ctx.lineTo(f.r * 0.3, f.r * 0.75);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(0, f.r * 0.5);
+        ctx.lineTo(-f.r * 0.3, f.r * 0.75);
+        ctx.stroke();
+        ctx.restore();
+
     }
+    ctx.restore();
 
     //def not done
 
@@ -154,16 +178,16 @@ function drawScore() {
     ctx.fillText("Score: " + score, 10, 30);
 
     for (let i = 0; i < max_misses; i++) {
-        ctx.fillStyle = i < (max_misses - misses) ? "#ef3737" : rgb(0, 0, 0);
-        ctx.fillText("h", w - 14 - i * 20, 30) //change to heart pic later
+        ctx.fillStyle = i < (max_misses - misses) ? "#ef3737" : "rgb(0, 0, 0)";
+        ctx.fillText("h", canvas.width - 14 - i * 20, 30) //change to heart pic later
     }
 }
 
-function updatePlayer() {
-    player.x += player.dx;
-    if (player.x < 0) player.x = 0;
-    if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
-}
+// function updatePlayer() {
+//     player.x += player.dx;
+//     if (player.x < 0) player.x = 0;
+//     if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+// }
 
 function updateGame() {
     player.x += player.dx;
@@ -171,7 +195,38 @@ function updateGame() {
 
     gameSpeed = 1+ score * 0.045;
 
-    if (misses >= max_misses) showLose();
+    spawnTimer++;
+    const spawnRate = Math.max(28, 70 - score * 1.5);
+    if (spawnTimer >= spawnRate) {
+        flakes.push(makeSnowflake());
+        spawnTimer = 0;
+    }
+
+    for (let i = flakes.length - 1; i >= 0; i--) {
+        const f = flakes[i];
+        f.y += f.dy;
+        f.rotation += f.spin;
+
+        if (
+            f.x > player.x - f.r &&
+            f.x < player.x + player.width + f.r &&
+            f.y > player.y &&
+            f.y < player.y + 20
+        ) {
+            flakes.splice(i, 1);
+            score++;
+            continue;
+        }
+
+        if (f.y > canvas.height + 10) {
+            flakes.splice(i, 1);
+            misses++;
+        }
+    }
+
+    if (misses >= max_misses) {
+        showLose();
+    };
 
     // items.forEach((item, index) => {
     //     item.y += item.dy;
@@ -217,7 +272,7 @@ if (state !== "playing") {
     // drawScore();
 
     flakes.forEach(drawSnowflake);
-    drawSnowman(player.x, player.y, player.width, player.height);
+    drawPlayer(player.x, player.y, player.width, player.height);
     updateGame();
     drawScore();
 
@@ -227,7 +282,7 @@ if (state !== "playing") {
 
 function showLose() {
     state = "lose";
-    document.getElementById("finalScore").textContent = score;
+    document.getElementById("final_score").textContent = score;
 
 
 }
@@ -241,6 +296,20 @@ document.addEventListener("keyup", () => {
     player.dx = 0;
 });
 
+
 // setInterval(makeSn, 1000);
+
+document.getElementById("play_btn").onlick = () => {
+    document.getElementById("home_screen").style.display = "none";
+    state = "playing";
+    initGame();
+};
+
+document.getElementById("replay_btn").onclick = () => {
+    document.getElementById("lose_screen").style.display = "none";
+    state = "playing";
+    initGame();
+};
+
 
 gameLoop();
